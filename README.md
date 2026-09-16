@@ -10,7 +10,7 @@ The **Smart Parking System** is an Embedded Systems project developed as the fin
 
 The system is designed to automate a parking gate using an **ATmega32 Microcontroller**, providing automatic vehicle detection, slot management, gate control, emergency handling, and non-volatile memory storage.
 
-The main goal of this project is to simulate a real-world smart parking solution using different embedded peripherals and communication modules.
+The main goal of this project is to implement a real-world smart parking solution using different embedded peripherals and communication protocols.
 
 ---
 
@@ -18,10 +18,10 @@ The main goal of this project is to simulate a real-world smart parking solution
 
 - Automate parking gate opening and closing.
 - Manage available parking slots dynamically.
-- Detect whether a vehicle actually entered the parking area.
+- Verify that vehicles actually entered the parking area.
 - Provide user feedback through an LCD display.
-- Save parking slots state even after power failure using EEPROM.
-- Implement emergency evacuation functionality.
+- Save parking slots state after power failure using EEPROM.
+- Implement an emergency evacuation mechanism.
 
 ---
 
@@ -29,6 +29,6 @@ The main goal of this project is to simulate a real-world smart parking solution
 
 ## 🚘 Vehicle Entry Management
 
-1. Vehicle approaches the gate.
-2. Ultrasonic sensor detects vehicle presence.
+1. A vehicle approaches the parking gate.
+2. The ultrasonic sensor detects vehicle presence.
 3. LCD displays:

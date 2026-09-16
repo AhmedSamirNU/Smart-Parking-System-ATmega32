@@ -1,3 +1,4 @@
+Markdown
 # 🚗 Smart Parking System — ATmega32 Embedded Project
 
 [![Microcontroller](https://img.shields.io/badge/Microcontroller-ATmega32-blue.svg)](https://www.microchip.com/)
@@ -41,3 +42,179 @@ An automated, robust **Embedded Smart Parking System** developed as the final gr
 ## 🏗️ Layered Software Architecture
 
 The software is structured following **Layered Embedded C Architecture** (MCAL, HAL, App) to ensure strict modularity, clean hardware abstraction, and ease of porting:
+
++-------------------------------------------------------------+
+|                     APPLICATION LAYER                       |
+|           (main.c, parking_app.c, state_machine.c)          |
++-------------------------------------------------------------+
+|
++-------------------------------------------------------------+
+|                 HARDWARE ABSTRACTION LAYER (HAL)            |
+|    (LCD, Ultrasonic, Servo Motors, 7-Seg, EEPROM, Buzzer)   |
++-------------------------------------------------------------+
+|
++-------------------------------------------------------------+
+|             MICROCONTROLLER ABSTRACTION LAYER (MCAL)        |
+|       (DIO, Timer1 PWM, Timer0, ADC, I2C / TWI, EXTI)       |
++-------------------------------------------------------------+
+|
++-------------------------------------------------------------+
+|                      HARDWARE (ATmega32)                    |
++-------------------------------------------------------------+
+
+
+![Software Architecture Layer](images/software_architecture.jpeg)
+
+---
+
+## 🔄 System Flowchart & State Logic
+
+The system operates based on a deterministic Finite State Machine (FSM):
+
+                   +----------------------+
+                   |    SYSTEM INITIAL    |
+                   |  Load EEPROM Slots   |
+                   +----------+-----------+
+                              |
+                              v
+                   +----------------------+
+                   |  Ultrasonic 1 Check  |
+                   |  Vehicle Present?    |
+                   +----------+-----------+
+                              | YES
+                              v
+                   +----------------------+
+                   | LCD: WELCOME         |
+                   | LCD: PRESS ENTER     |
+                   +----------+-----------+
+                              |
+                    [ ENTER BUTTON PRESSED ]
+                              |
+              +---------------+---------------+
+              |                               |
+   [ Slots Available > 0 ]           [ Slots == 0 (FULL) ]
+              |                               |
+              v                               v
+   +--------------------+          +--------------------+
+   | Yellow LED ON (3s) |          | Red LED ON         |
+   | Slot Diagnostics   |          | Buzzer Alarm ON    |
+   +----------+---------+          | LCD: PARKING FULL  |
+              |                    +--------------------+
+              v
+   +--------------------+
+   | Green LED ON       |
+   | Servo Opens Gate   |
+   | 7-Seg Countdown    |
+   +----------+---------+
+              |
+ +------------+------------+
+ |                         |
+[ Ultra 2 Detects Pass ]   [ No Pass Detected ]
+|                         |
+v                         v
++------------------+    +------------------+
+| Gate Closes      |    | Gate Closes      |
+| Decrement Slot   |    | LCD: TIME OUT    |
+| Save to EEPROM   |    |      TRY AGAIN   |
++------------------+    +------------------+
+
+
+![System Flowchart](images/system_flowchart.jpeg)
+
+---
+
+## 🛠️ Hardware Components & Connections
+
+| Component | Quantity | Interface Pin / Protocol | Function |
+| :--- | :---: | :--- | :--- |
+| **ATmega32 Microcontroller** | 1 | - | System Master Core |
+| **Ultrasonic Sensor #1 (HC-SR04)** | 1 | Trigger / Echo Pins | Approach Detection at Outer Gate |
+| **Ultrasonic Sensor #2 (HC-SR04)** | 1 | Trigger / Echo Pins | Passage Verification inside Entryway |
+| **Servo Motor (SG90)** | 1 | Timer1 PWM (OC1A/OC1B) | Gate Barrier Actuator |
+| **16x2 Character LCD** | 1 | 4-Bit / 8-Bit DIO | User Interface & Status Display |
+| **7-Segment Display** | 1 | Multiplexed DIO | Gate Pass Timer Countdown (9 to 0) |
+| **Status LEDs (Red, Yellow, Green)**| 3 | DIO Outputs | Visual Status Indicators |
+| **Buzzer** | 1 | DIO Output | Audio Warning for Full Capacity |
+| **Push Buttons** | 3 | External Interrupts / DIO | Entry, Exit, Emergency |
+| **24C02 / Internal EEPROM** | 1 | I2C (TWI) / Internal | Slot Counter State Memory |
+
+---
+
+## 📸 Hardware Setup & Demonstration Screenshots
+
+### 1. Circuit Simulation in Proteus 8
+Complete functional schematic and logic simulation of ATmega32 drivers and peripherals.
+
+![Proteus Simulation](images/proteus_simulation.png)
+
+---
+
+### 2. Initial State (Slots = 5)
+Initial system bootup showing 5 available slots loaded from EEPROM memory.
+
+![Initial Slots State](images/initial_slots_state.jpeg)
+
+---
+
+### 3. Entry & User Interaction Controls
+Push button interface for initiating entry request and processing gate diagnostics.
+
+![Entry Button](images/entry_button.jpeg)
+
+---
+
+### 4. Exit & Emergency Management
+Dedicated control interface for vehicle exit and instant evacuation (Emergency Clear).
+
+![Exit and Emergency Buttons](images/exit_emergency_buttons.jpeg)
+
+---
+
+### 5. Physical Hardware Wiring & Interfacing
+Real-world physical hardware setup featuring custom breadboard wiring, ATmega32 development board, and sensor mounting.
+
+![Real Hardware Connections](images/real_hardware_connections.jpeg)
+
+---
+
+### 6. Software Development in Eclipse
+Source code implementation using Eclipse IDE with GCC toolchain.
+
+![Eclipse Screenshot](images/software_architecture.jpeg)
+
+---
+
+## 📂 Repository Directory Structure
+
+Smart-Parking-System-ATmega32/
+├── MCAL/
+├── HAL/
+│   ├── LCD/
+│   ├── ULTRASONIC/
+│   ├── SERVO/
+│   ├── SEVEN_SEGMENT/
+│   └── EEPROM/
+├── APP/
+│   ├── main.c
+│   └── parking_app.c
+├── Simulation/
+│   └── Smart_Parking_Proteus.pdsprj
+├── images/
+│   ├── cover_image.jpeg
+│   ├── proteus_simulation.png
+│   ├── initial_slots_state.jpeg
+│   ├── entry_button.jpeg
+│   ├── exit_emergency_buttons.jpeg
+│   ├── real_hardware_connections.jpeg
+│   ├── system_flowchart.jpeg
+│   └── software_architecture.jpeg
+└── README.md
+
+
+---
+
+## 👨‍💻 Author & Acknowledgments
+
+**Ahmed Samir**  
+*Electronics & Communications Engineering Student*  
+*Information Technology Institute (ITI) Summer Program — Final Graduation Project*

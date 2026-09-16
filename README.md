@@ -213,8 +213,12 @@ Smart-Parking-System-ATmega32/
 
 ---
 
-## 👨‍💻 Author & Acknowledgments
+## 👨‍💻 Authors & Acknowledgments
 
 **Ahmed Samir**  
-*Electronics & Communications Engineering Student*  
+**Hana Yasser**  
+**Mohamed Aboelkasem**  
+**Rawan Ayman**  
+
+*Electronics & Communications Engineering Students*  
 *Information Technology Institute (ITI) Summer Program — Final Graduation Project*

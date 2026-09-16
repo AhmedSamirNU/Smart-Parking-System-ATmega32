@@ -1,5 +1,5 @@
 Markdown
-# 🚗 Smart Parking System — ATmega32 Embedded Project
+# 🚗 Smart Parking System — ATmega32 Embedded Project 
 
 [![Microcontroller](https://img.shields.io/badge/Microcontroller-ATmega32-blue.svg)](https://www.microchip.com/)
 [![Language](https://img.shields.io/badge/Language-Embedded%20C-orange.svg)](https://en.wikipedia.org/wiki/C_(programming_language))

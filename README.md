@@ -1,262 +1,219 @@
-# 🚗 Smart Parking System
+# 🚗 Smart Parking System — ATmega32 Embedded Project
 
-> An embedded systems final project built on the **ATmega32** microcontroller, developed as part of the **ITI (Information Technology Institute)** embedded systems track.
+[![Microcontroller](https://img.shields.io/badge/Microcontroller-ATmega32-blue.svg)](https://www.microchip.com/)
+[![Language](https://img.shields.io/badge/Language-Embedded%20C-orange.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![IDE](https://img.shields.io/badge/IDE-Eclipse%20%2F%20Microchip%20Studio-brightgreen.svg)](https://www.eclipse.org/)
+[![Simulation](https://img.shields.io/badge/Simulation-Proteus%208%20Professional-red.svg)](https://www.labcenter.com/)
 
-![Cover](images/cover_image.jpeg)
-
----
-
-## 📋 Table of Contents
-
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [System Flow](#system-flow)
-- [Hardware Components](#hardware-components)
-- [Pin Configuration](#pin-configuration)
-- [Software Architecture](#software-architecture)
-- [Proteus Simulation](#proteus-simulation)
-- [Real Hardware](#real-hardware)
-- [Team](#team)
+An automated, robust **Embedded Smart Parking System** developed as the final graduation project for the **Information Technology Institute (ITI)** Embedded Systems Training Program. The system manages entry gate access, slot availability tracking with double-verification, emergency override protocols, non-volatile state persistence, and real-time visual/auditory hardware feedback.
 
 ---
 
-## Project Overview
-
-The Smart Parking System automates gate control and real-time slot management for a 5-slot parking lot. A car approaching the entrance is detected by an ultrasonic sensor; the driver presses a button to request entry, the system checks availability, opens the gate via a servo motor, and confirms the car has actually passed through using a second ultrasonic sensor mounted above the gateway. Slot count is persisted in EEPROM so it survives power cycles.
+![Project Cover Header](images/cover_image.jpeg)
 
 ---
 
-## Features
+## 📌 Key Features & Highlights
 
-| Feature | Details |
-|---|---|
-| 🚘 Car Detection | HC-SR04 ultrasonic sensor detects cars at the entrance (< 20 cm) |
-| ✅ Slot Availability Check | 3-second visual check with Yellow LED before opening gate |
-| 🚦 Traffic LEDs | Green = available / Yellow = checking / Red = full or denied |
-| 🔁 Servo Gate Control | SG90 servo opens and closes the barrier automatically |
-| ⏱ 7-Segment Countdown | Counts down 9 → 0 while gate is open |
-| 🔍 Entry Confirmation | Second ultrasonic sensor above the gateway confirms the car entered |
-| ⏰ Timeout Handling | If car doesn't pass through, shows TIME OUT → TRY AGAIN |
-| 🚪 Exit Flow | Exit button opens gate, increments slot count, saves to EEPROM |
-| 🚨 Emergency Override | Emergency button opens gate immediately and releases one slot |
-| 💾 EEPROM Persistence | Slot count saved to AT24C02 via I²C — survives power loss |
-| 📟 UART Logging | All system events streamed to terminal for debugging |
+- **🚦 Entry Access Control & Ultrasonic Detection:**
+  - Entrance Ultrasonic Sensor detects approaching vehicles and prompts drivers via a 16x2 LCD display (`WELCOME` $\rightarrow$ `PRESS ENTER BUTTON`).
+  - Pressing the **Entry Button** triggers a **3-second diagnostic check** (Yellow LED illuminated) to verify slot availability.
 
----
+- **🛡️ Double-Verification Anti-Cheating / Entry Detection Logic:**
+  - Gate servo opens (Green LED ON, LCD displays `GATE OPEN`) and a 7-Segment Display counts down from `9` to `0`.
+  - **Secondary Ultrasonic Sensor** mounted above the inner entryway measures overhead height-to-ground distance.
+  - If a vehicle physically enters, the distance drop confirms passage $\rightarrow$ Gate closes, slot count decrements.
+  - **Timeout Safeguard:** If no vehicle passes through after opening, the system aborts entry, displays `TIME OUT / TRY AGAIN`, resets to `PRESS ENTER BUTTON`, and preserves the existing slot counter.
 
-## System Flow
+- **💾 Non-Volatile State Memory (EEPROM Integration):**
+  - Current occupied/available slot count is permanently logged into external/internal **EEPROM**.
+  - Restores precise slot status instantly upon power loss or system reset.
 
-![Flowchart](images/system_flowchart.jpeg)
+- **🚨 Emergency Override Protocol:**
+  - Dedicated **Emergency Button** triggers immediate evacuation mode.
+  - Instantly opens the barrier servo and clears/resets all 5 parking slots.
 
-### Entry Flow
-
-Car detected by US1 (< 20 cm)
-│
-▼
-LCD: "WELCOME"
-LCD: "PRESS ENTER BUTTON"
-│
-[ENTRY button pressed]
-│
-▼
-Yellow LED ON → CHECKING (3 s)
-│
-┌────┴────┐
-│ │
-SLOTS > 0 SLOTS = 0
-│ │
-▼ ▼
-Green LED Red LED + Buzzer
-GATE OPEN LCD: "PARKING FULL"
-Servo 90°
-7-Seg: 9→0
-│
-▼
-US2 detects car passed?
-│
-┌─┴─┐
-YES NO
-│ │
-▼ ▼
-SLOTS-- TIME OUT
-EEPROM TRY AGAIN
-saved
-Gate closes
-LCD: SLOTS=N
-
-
-### Exit Flow
-
-[EXIT button pressed]
-│
-▼
-LCD: "BYE BYE / DRIVE SAFE"
-Gate opens → countdown 9→0
-Gate closes → SLOTS++
-EEPROM saved → LCD: SLOTS=N
-
-
-### Emergency Flow
-
-[EMERGENCY button pressed]
-│
-▼
-Red + Yellow LEDs ON
-LCD: "! EMERGENCY !"
-Gate opens immediately
-Hold 3 s after release
-Gate closes → SLOTS++
-EEPROM saved → LCD: SLOTS=N
-
+- **🚫 Full Capacity Management:**
+  - When all 5 slots are occupied, the system switches to `FULL` status on the LCD, turns on the **Red Warning LED**, and activates an **Auditory Buzzer**.
 
 ---
 
-## Hardware Components
+## 🏗️ Layered Software Architecture
 
-| Component | Role |
-|---|---|
-| ATmega32 @ 8 MHz | Main microcontroller |
-| HC-SR04 (×2) | US1: entrance detection / US2: passage confirmation |
-| SG90 Servo Motor | Gate actuator |
-| LCD 16×2 (HD44780) | Status display — 4-bit mode |
-| 7-Segment Display | Gate-open countdown (9 → 0) |
-| LEDs ×3 (R/Y/G) | Traffic-light style status indicators |
-| Active Buzzer | Audio alert for full parking / denied entry |
-| Push Buttons ×3 | Entry / Exit / Emergency |
-| AT24C02 EEPROM | Non-volatile slot count storage via I²C |
+The software is structured following **Layered Embedded C Architecture** (MCAL, HAL, App) to ensure strict modularity, clean hardware abstraction, and ease of porting:
 
----
++-------------------------------------------------------------+
+|                     APPLICATION LAYER                       |
+|           (main.c, parking_app.c, state_machine.c)          |
++-------------------------------------------------------------+
+|
++-------------------------------------------------------------+
+|                 HARDWARE ABSTRACTION LAYER (HAL)            |
+|    (LCD, Ultrasonic, Servo Motors, 7-Seg, EEPROM, Buzzer)   |
++-------------------------------------------------------------+
+|
++-------------------------------------------------------------+
+|             MICROCONTROLLER ABSTRACTION LAYER (MCAL)        |
+|       (DIO, Timer1 PWM, Timer0, ADC, I2C / TWI, EXTI)       |
++-------------------------------------------------------------+
+|
++-------------------------------------------------------------+
+|                      HARDWARE (ATmega32)                    |
++-------------------------------------------------------------+
 
-## Pin Configuration
 
-| Port | Pin | Connected To |
-|---|---|---|
-| PORTA | PA0 | LCD RS |
-| PORTA | PA1 | LCD RW |
-| PORTA | PA2 | LCD EN |
-| PORTA | PA3 | Buzzer |
-| PORTA | PA4 | LED RED |
-| PORTA | PA5 | LED YELLOW |
-| PORTA | PA6 | LED GREEN |
-| PORTA | PA7 | US2 TRIG |
-| PORTB | PB0–PB6 | 7-Segment (a–g) |
-| PORTC | PC2 | US1 TRIG |
-| PORTC | PC3 | US1 ECHO |
-| PORTC | PC4–PC7 | LCD D4–D7 |
-| PORTD | PD2 | US2 ECHO |
-| PORTD | PD3 | EMERGENCY Button (pull-up) |
-| PORTD | PD5 | Servo PWM (OC1A — Timer1) |
-| PORTD | PD6 | ENTRY Button (pull-up) |
-| PORTD | PD7 | EXIT Button (pull-up) |
+![Software Architecture Layer](images/software_architecture.jpeg)
 
 ---
 
-## Software Architecture
+## 🔄 System Flowchart & State Logic
 
-![Software Architecture](images/software_architecture.jpeg)
+The system operates based on a deterministic Finite State Machine (FSM):
 
-The codebase follows a strict **3-layer embedded architecture**:
+                   +----------------------+
+                   |    SYSTEM INITIAL    |
+                   |  Load EEPROM Slots   |
+                   +----------+-----------+
+                              |
+                              v
+                   +----------------------+
+                   |  Ultrasonic 1 Check  |
+                   |  Vehicle Present?    |
+                   +----------+-----------+
+                              | YES
+                              v
+                   +----------------------+
+                   | LCD: WELCOME         |
+                   | LCD: PRESS ENTER     |
+                   +----------+-----------+
+                              |
+                    [ ENTER BUTTON PRESSED ]
+                              |
+              +---------------+---------------+
+              |                               |
+   [ Slots Available > 0 ]           [ Slots == 0 (FULL) ]
+              |                               |
+              v                               v
+   +--------------------+          +--------------------+
+   | Yellow LED ON (3s) |          | Red LED ON         |
+   | Slot Diagnostics   |          | Buzzer Alarm ON    |
+   +----------+---------+          | LCD: PARKING FULL  |
+              |                    +--------------------+
+              v
+   +--------------------+
+   | Green LED ON       |
+   | Servo Opens Gate   |
+   | 7-Seg Countdown    |
+   +----------+---------+
+              |
+ +------------+------------+
+ |                         |
+[ Ultra 2 Detects Pass ]   [ No Pass Detected ]
+|                         |
+v                         v
++------------------+    +------------------+
+| Gate Closes      |    | Gate Closes      |
+| Decrement Slot   |    | LCD: TIME OUT    |
+| Save to EEPROM   |    |      TRY AGAIN   |
++------------------+    +------------------+
 
-┌─────────────────────────────┐
-│ APP Layer │ PARKING_program.c / config / interface
-│ (Application Logic) │ State machine — calls HAL only
-├─────────────────────────────┤
-│ HAL Layer │ LCD · LED · BUZZER · SERVO
-│ (Hardware Abstraction) │ SEVEN_SEG · ULTRASONIC · BUTTON · EEPROM
-├─────────────────────────────┤
-│ MCAL Layer │ DIO · TIMER · PWM · UART · I2C
-│ (MCU Abstraction) │ Direct register manipulation
-└─────────────────────────────┘
 
-
-Each driver follows the naming convention:
-
-<MODULE>_program.c — implementation
-<MODULE>_interface.h — public API
-<MODULE>_config.h — user-configurable defines
-
-
-### MCAL Drivers Used
-
-| Driver | Why |
-|---|---|
-| **DIO** | GPIO abstraction for all ports — SET/CLR/GET bit macros |
-| **TIMER1** | Fast PWM Mode 14, 50 Hz → servo angle control via OC1A |
-| **PWM** | Thin wrapper over TIMER1 for duty-cycle → angle mapping |
-| **UART** | 9600 baud 8N1 — debug telemetry for all system events |
-| **I²C / TWI** | 100 kHz standard mode — AT24C02 EEPROM read/write |
+![System Flowchart](images/system_flowchart.jpeg)
 
 ---
 
-## Proteus Simulation
+## 🛠️ Hardware Components & Connections
+
+| Component | Quantity | Interface Pin / Protocol | Function |
+| :--- | :---: | :--- | :--- |
+| **ATmega32 Microcontroller** | 1 | - | System Master Core |
+| **Ultrasonic Sensor #1 (HC-SR04)** | 1 | Trigger / Echo Pins | Approach Detection at Outer Gate |
+| **Ultrasonic Sensor #2 (HC-SR04)** | 1 | Trigger / Echo Pins | Passage Verification inside Entryway |
+| **Servo Motor (SG90)** | 1 | Timer1 PWM (OC1A/OC1B) | Gate Barrier Actuator |
+| **16x2 Character LCD** | 1 | 4-Bit / 8-Bit DIO | User Interface & Status Display |
+| **7-Segment Display** | 1 | Multiplexed DIO | Gate Pass Timer Countdown (9 to 0) |
+| **Status LEDs (Red, Yellow, Green)**| 3 | DIO Outputs | Visual Status Indicators |
+| **Buzzer** | 1 | DIO Output | Audio Warning for Full Capacity |
+| **Push Buttons** | 3 | External Interrupts / DIO | Entry, Exit, Emergency |
+| **24C02 / Internal EEPROM** | 1 | I2C (TWI) / Internal | Slot Counter State Memory |
+
+---
+
+## 📸 Hardware Setup & Demonstration Screenshots
+
+### 1. Circuit Simulation in Proteus 8
+Complete functional schematic and logic simulation of ATmega32 drivers and peripherals.
 
 ![Proteus Simulation](images/proteus_simulation.png)
 
-Full circuit simulated in **Proteus 8** before hardware assembly.  
-Virtual instruments used: oscilloscope (PWM signal), virtual terminal (UART log).
+---
+
+### 2. Initial State (Slots = 5)
+Initial system bootup showing 5 available slots loaded from EEPROM memory.
+
+![Initial Slots State](images/initial_slots_state.jpeg)
 
 ---
 
-## Real Hardware
-
-### Initial State — 5 Slots Available
-
-![Slots = 5](images/initial_slots_state.jpeg)
-
-### Entry Button
+### 3. Entry & User Interaction Controls
+Push button interface for initiating entry request and processing gate diagnostics.
 
 ![Entry Button](images/entry_button.jpeg)
 
-### Exit & Emergency Buttons
+---
+
+### 4. Exit & Emergency Management
+Dedicated control interface for vehicle exit and instant evacuation (Emergency Clear).
 
 ![Exit and Emergency Buttons](images/exit_emergency_buttons.jpeg)
 
-### Hardware Connections
+---
+
+### 5. Physical Hardware Wiring & Interfacing
+Real-world physical hardware setup featuring custom breadboard wiring, ATmega32 development board, and sensor mounting.
 
 ![Real Hardware Connections](images/real_hardware_connections.jpeg)
 
 ---
 
-## Project Structure
+### 6. Software Development in Eclipse
+Source code implementation using Eclipse IDE with GCC toolchain.
 
-FINAL_PARKING_PROJECT/
-├── main.c
-├── STD_TYPES.h
-├── BIT_MATH.h
-├── APP/
-│ └── PARKING/
-│ ├── PARKING_program.c
-│ ├── PARKING_interface.h
-│ └── PARKING_config.h
-├── HAL/
-│ ├── LCD/
-│ ├── LED/
-│ ├── BUZZER/
-│ ├── SERVO/
-│ ├── SEVEN_SEG/
-│ ├── ULTRASONIC/
-│ ├── BUTTON/
-│ └── EEPROM/
+![Eclipse Screenshot](images/software_architecture.jpeg)
+
+---
+
+## 📂 Repository Directory Structure
+
+Smart-Parking-System-ATmega32/
 ├── MCAL/
-│ ├── DIO/
-│ ├── TIMER/
-│ ├── PWM/
-│ ├── UART/
-│ └── I2C/
-└── proteus simulation/
+├── HAL/
+│   ├── LCD/
+│   ├── ULTRASONIC/
+│   ├── SERVO/
+│   ├── SEVEN_SEGMENT/
+│   └── EEPROM/
+├── APP/
+│   ├── main.c
+│   └── parking_app.c
+├── Simulation/
+│   └── Smart_Parking_Proteus.pdsprj
+├── images/
+│   ├── cover_image.jpeg
+│   ├── proteus_simulation.png
+│   ├── initial_slots_state.jpeg
+│   ├── entry_button.jpeg
+│   ├── exit_emergency_buttons.jpeg
+│   ├── real_hardware_connections.jpeg
+│   ├── system_flowchart.jpeg
+│   └── software_architecture.jpeg
+└── README.md
 
 
 ---
 
-## Team
+## 👨‍💻 Author & Acknowledgments
 
-| Name |
-|---|
-| Ahmed Samir |
-| Hana Yasser |
-| Mohamed Aboelkasem |
-| Rawan Ayman |
-
-**Instructors:** Mahmoud Fared · Mostafa Aladly
-
-**Program:** ITI — Information Technology Institute · Embedded Systems Track · 2026
+**Ahmed Samir**  
+*Electronics & Communications Engineering Student*  
+*Information Technology Institute (ITI) Summer Program — Final Graduation Project*

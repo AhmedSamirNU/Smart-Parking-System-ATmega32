@@ -112,34 +112,6 @@ Source code implementation using Eclipse IDE with GCC toolchain.
 
 ---
 
-## 📂 Repository Directory Structure
-Smart-Parking-System-ATmega32/
-├── MCAL/
-├── HAL/
-│   ├── LCD/
-│   ├── ULTRASONIC/
-│   ├── SERVO/
-│   ├── SEVEN_SEGMENT/
-│   └── EEPROM/
-├── APP/
-│   ├── main.c
-│   └── parking_app.c
-├── Simulation/
-│   └── Smart_Parking_Proteus.pdsprj
-├── images/
-│   ├── cover_image.jpeg
-│   ├── proteus_simulation.png
-│   ├── initial_slots_state.jpeg
-│   ├── entry_button.jpeg
-│   ├── exit_emergency_buttons.jpeg
-│   ├── real_hardware_connections.jpeg
-│   ├── system_flowchart.jpeg
-│   └── software_architecture.jpeg
-└── README.md
-
-
----
-
 ## 👨‍💻 Authors & Acknowledgments
 
 **Ahmed Samir**

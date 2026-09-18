@@ -115,8 +115,11 @@ Source code implementation using Eclipse IDE with GCC toolchain.
 ## 👨‍💻 Authors & Acknowledgments
 
 **Ahmed Samir**
+---
 **Hana Yasser**
+---
 **Mohamed Aboelkasem**
+---
 **Rawan Ayman**
 
 *Electronics & Communications Engineering Student*  

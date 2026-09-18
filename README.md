@@ -68,24 +68,6 @@ The software is structured following **Layered Embedded C Architecture** (MCAL, 
 
 ---
 
-## 🔌 Hardware Pin Mapping (ATmega32)
-
-| Component / Peripheral | ATmega32 Pin / Port | Function / Description |
-| :--- | :--- | :--- |
-| **LCD 16x2 (Data)** | `PORTA` (PA0 - PA7) | 8-Bit / 4-Bit Data Bus |
-| **LCD Control (RS / EN)** | `PORTB0` / `PORTB1` | Control Lines |
-| **Ultrasonic #1 (Outer)** | Trig: `PORTD0` \| Echo: `PORTD1` | Approach Detection |
-| **Ultrasonic #2 (Inner)** | Trig: `PORTD2` \| Echo: `PORTD3` | Passage Verification |
-| **Servo Motor (SG90)** | `PORTD5` (OC1A / Timer1 PWM) | Gate Barrier Control |
-| **7-Segment Display** | `PORTC` (PC0 - PC6) | Multiplexed Countdown Timer |
-| **I2C EEPROM (24C02)** | `SCL` (PC0) / `SDA` (PC1) | Non-volatile Slot Storage |
-| **Entry Push Button** | `PORTD2` (INT0 / DIO) | Entry Request |
-| **Emergency Push Button** | `PORTD3` (INT1 / DIO) | Instant Evacuation Mode |
-| **Status LEDs (R / Y / G)**| `PORTB2`, `PORTB3`, `PORTB4` | Visual Indicators |
-| **Buzzer** | `PORTB5` | Full Capacity Alarm |
-
----
-
 ## 📸 Hardware Setup & Demonstration Screenshots
 
 ### 1. Circuit Simulation in Proteus 8

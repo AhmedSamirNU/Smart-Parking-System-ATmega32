@@ -41,27 +41,6 @@ An automated, robust **Embedded Smart Parking System** developed as the final gr
 ## 🏗️ Layered Software Architecture
 
 The software is structured following **Layered Embedded C Architecture** (MCAL, HAL, App) to ensure strict modularity, clean hardware abstraction, and ease of porting:
-
-+-------------------------------------------------------------+
-|                     APPLICATION LAYER                       |
-|           (main.c, parking_app.c, state_machine.c)          |
-+-------------------------------------------------------------+
-|
-+-------------------------------------------------------------+
-|                 HARDWARE ABSTRACTION LAYER (HAL)            |
-|    (LCD, Ultrasonic, Servo Motors, 7-Seg, EEPROM, Buzzer)   |
-+-------------------------------------------------------------+
-|
-+-------------------------------------------------------------+
-|             MICROCONTROLLER ABSTRACTION LAYER (MCAL)        |
-|       (DIO, Timer1 PWM, Timer0, ADC, I2C / TWI, EXTI)       |
-+-------------------------------------------------------------+
-|
-+-------------------------------------------------------------+
-|                      HARDWARE (ATmega32)                    |
-+-------------------------------------------------------------+
-
-
 ![Software Architecture Layer](images/software_architecture.jpeg)
 
 ---
@@ -70,7 +49,7 @@ The software is structured following **Layered Embedded C Architecture** (MCAL, 
 
 The system operates based on a deterministic Finite State Machine (FSM):
 
-                   +----------------------+
++----------------------+
                    |    SYSTEM INITIAL    |
                    |  Load EEPROM Slots   |
                    +----------+-----------+
@@ -117,8 +96,7 @@ v                         v
 | Save to EEPROM   |    |      TRY AGAIN   |
 +------------------+    +------------------+
 
-
-![System Flowchart](images/system_flowchart.jpeg)
+ ![System Flowchart](images/system_flowchart.jpeg)
 
 ---
 
@@ -184,7 +162,6 @@ Source code implementation using Eclipse IDE with GCC toolchain.
 ---
 
 ## 📂 Repository Directory Structure
-
 Smart-Parking-System-ATmega32/
 ├── MCAL/
 ├── HAL/
@@ -212,8 +189,12 @@ Smart-Parking-System-ATmega32/
 
 ---
 
-## 👨‍💻 Author & Acknowledgments
+## 👨‍💻 Authors & Acknowledgments
 
-**Ahmed Samir**  
+**Ahmed Samir**
+**Hana Yasser**
+**Mohamed Aboelkasem**
+**Rawan Ayman**
+
 *Electronics & Communications Engineering Student*  
 *Information Technology Institute (ITI) Summer Program — Final Graduation Project*

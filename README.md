@@ -47,55 +47,6 @@ The software is structured following **Layered Embedded C Architecture** (MCAL, 
 
 ## 🔄 System Flowchart & State Logic
 
-The system operates based on a deterministic Finite State Machine (FSM):
-
-+----------------------+
-                   |    SYSTEM INITIAL    |
-                   |  Load EEPROM Slots   |
-                   +----------+-----------+
-                              |
-                              v
-                   +----------------------+
-                   |  Ultrasonic 1 Check  |
-                   |  Vehicle Present?    |
-                   +----------+-----------+
-                              | YES
-                              v
-                   +----------------------+
-                   | LCD: WELCOME         |
-                   | LCD: PRESS ENTER     |
-                   +----------+-----------+
-                              |
-                    [ ENTER BUTTON PRESSED ]
-                              |
-              +---------------+---------------+
-              |                               |
-   [ Slots Available > 0 ]           [ Slots == 0 (FULL) ]
-              |                               |
-              v                               v
-   +--------------------+          +--------------------+
-   | Yellow LED ON (3s) |          | Red LED ON         |
-   | Slot Diagnostics   |          | Buzzer Alarm ON    |
-   +----------+---------+          | LCD: PARKING FULL  |
-              |                    +--------------------+
-              v
-   +--------------------+
-   | Green LED ON       |
-   | Servo Opens Gate   |
-   | 7-Seg Countdown    |
-   +----------+---------+
-              |
- +------------+------------+
- |                         |
-[ Ultra 2 Detects Pass ]   [ No Pass Detected ]
-|                         |
-v                         v
-+------------------+    +------------------+
-| Gate Closes      |    | Gate Closes      |
-| Decrement Slot   |    | LCD: TIME OUT    |
-| Save to EEPROM   |    |      TRY AGAIN   |
-+------------------+    +------------------+
-
  ![System Flowchart](images/system_flowchart.jpeg)
 
 ---
